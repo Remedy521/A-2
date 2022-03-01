@@ -3,11 +3,11 @@ global N ;%STAR elemnt number
 N = 20;
 global M ;%Antenna number of BS
 M = 8;
-NUM = 100; %–≈µ¿¥Œ ˝
-P_IM = -15:5:15;%IU∑¢…‰π¶¬ dBm
-PIM=10.^(P_IM/10);%◊™ªª≥…dBm
-P_OM = -15:5:15;%IU∑¢…‰π¶¬ dBm
-POM=10.^(P_OM/10);%◊™ªª≥…dBm
+NUM = 100; %‰ø°ÈÅìÊ¨°Êï∞
+P_IM = -15:5:15;%IUÂèëÂ∞ÑÂäüÁéádBm
+PIM=10.^(P_IM/10);%ËΩ¨Êç¢ÊàêdBm
+P_OM = -15:5:15;%IUÂèëÂ∞ÑÂäüÁéádBm
+POM=10.^(P_OM/10);%ËΩ¨Êç¢ÊàêdBm
 Ka_Los = 5;
 pno = sqrt(10.^(-105/10));
 x_BS = 5i;
@@ -18,11 +18,11 @@ x_OU = 50-15i;
 q = 3;
 for l = 1:NUM
 % channel initialization
-h_IS = sqrt(0.001*(abs(x_S-x_IU))^(-2.5))*1/sqrt(2)*(normrnd(0,1,N,1)+1i*normrnd(0,1,N,1));%IUµΩSTAR–≈µ¿
-h_OS = sqrt(0.001*(abs(x_S-x_OU))^(-2.5))*1/sqrt(2)*(normrnd(0,1,N,1)+1i*normrnd(0,1,N,1));%OUµΩSTAR–≈µ¿
-h_ES = sqrt(0.001*(abs(x_S-x_E))^(-2.5))/pno*1/sqrt(2)*(normrnd(0,1,N,1)+1i*normrnd(0,1,N,1));%STARµΩE–≈µ¿
+h_IS = sqrt(0.001*(abs(x_S-x_IU))^(-2.5))*1/sqrt(2)*(normrnd(0,1,N,1)+1i*normrnd(0,1,N,1));%IUÂà∞STAR‰ø°ÈÅì
+h_OS = sqrt(0.001*(abs(x_S-x_OU))^(-2.5))*1/sqrt(2)*(normrnd(0,1,N,1)+1i*normrnd(0,1,N,1));%OUÂà∞STAR‰ø°ÈÅì
+h_ES = sqrt(0.001*(abs(x_S-x_E))^(-2.5))/pno*1/sqrt(2)*(normrnd(0,1,N,1)+1i*normrnd(0,1,N,1));%STARÂà∞E‰ø°ÈÅì
 
-G_NLoS = 1/sqrt(2)*(normrnd(0,1,N,M)+1i*normrnd(0,1,N,M));%STARµΩBSµÿNLoS–≈µ¿
+G_NLoS = 1/sqrt(2)*(normrnd(0,1,N,M)+1i*normrnd(0,1,N,M));%STARÂà∞BSÂú∞NLoS‰ø°ÈÅì
 G_LoS_t = 1;
 G_LoS_r = 1;
 d_r_lamda = 0.5;
@@ -36,7 +36,7 @@ for i = 2:N
 end
 G_LoS = G_LoS_r'*G_LoS_t;
 
-G = sqrt(0.001*(abs(x_BS-x_S))^(-2.2)*Ka_Los/(Ka_Los+1))*G_LoS+sqrt(0.001*(abs(x_BS-x_S))^(-2.2)*1/(Ka_Los+1))*G_NLoS;%STARµΩBS–≈µ¿
+G = sqrt(0.001*(abs(x_BS-x_S))^(-2.2)*Ka_Los/(Ka_Los+1))*G_LoS+sqrt(0.001*(abs(x_BS-x_S))^(-2.2)*1/(Ka_Los+1))*G_NLoS;%STARÂà∞BS‰ø°ÈÅì
 G = G/pno;
 
 q_I = G'*diag(h_IS);
@@ -87,13 +87,13 @@ ro1 = 0.1;
 ro2 = 0.1;
 while(1)    
 cvx_begin sdp
-            variables gI_l gO_l gO_u Q z ow tau pn_1 pn_2 pn_3
+            variables gI_l gO_l gO_u Q z ow tau pn_1 pn_2
             variable W(M,M) complex semidefinite
             variable U_t(N,N) complex semidefinite
             variable U_r(N,N) complex semidefinite
             variable u_t(N,1) complex
             variable u_r(N,1) complex
-            maximize(tau-ro1*pn_1-ro2*pn_2-pn_3)
+            maximize(tau-ro1*pn_1-ro2*pn_2)
             subject to
                 
                 PI*gI_l >= PO*gO_u;
@@ -108,11 +108,10 @@ cvx_begin sdp
 
                 pn_1 >= 0;
                 pn_2 >= 0;
-                pn_3 >= 0;
+  
                 
                 W >= 0;
                 trace(W) == 1;
-                real(trace(W'*(I_2-w_1'*w_1))) <= pn_3;
                 
                 2*real(trace((q_O'*W_1*q_O+U_r1)*(q_O'*W*q_O+U_r)'))-norm(q_O'*W_1*q_O+U_r1,'fro')^2 >= 4*gO_l+pow_pos(norm(q_O'*W*q_O-U_r,'fro'),2);
                 4*gO_u+2*real(trace((q_O'*W_1*q_O-U_r1)*(q_O'*W*q_O-U_r)'))-norm(q_O'*W_1*q_O-U_r1,'fro')^2 >= pow_pos(norm(q_O'*W*q_O+U_r,'fro'),2);
@@ -150,11 +149,6 @@ cvx_begin sdp
 	[a2 b2] = max(D2);
 	u_r_1 = V_2(:,b2);
     
-    U_3 = W;
-	[V_3 D_3] = eig(U_3);
-  	D3= diag(D_3);
-	[a3 b3] = max(D3);
-	w_1 = V_3(:,b3);
     
     lamda1 = (1+Q)/(1+PI*real(trace(U_t*J_EI)));
     lamda2 = (1+PO*gO_l)/(1+PO*real(trace(U_r*J_EO)));
@@ -176,9 +170,6 @@ cvx_begin sdp
         u_rr = V_2*sqrt(D_2);
         u_r = u_rr(:,N);
         nr(np) = norm(u_r*u_r'-U_r);
-        ww = V_3*sqrt(D_3);
-        w = ww(:,M);
-        nw(np) = norm(w*w'-W);
         break;
     end
 	ns = ns + 1;
@@ -205,9 +196,9 @@ R_sO_P = log2((1+B1*PO)/(1+B2*PO));
 
 
 if mod(nd,2)==0
-	Q_min_o = min(R_sI_P,R_sO_P);%nŒ™≈º ˝      
+	Q_min_o = min(R_sI_P,R_sO_P);%n‰∏∫ÂÅ∂Êï∞      
 else
-	Q_min_j = min(R_sI_P,R_sO_P);%nŒ™∆Ê ˝   
+	Q_min_j = min(R_sI_P,R_sO_P);%n‰∏∫Â•áÊï∞   
 end
 if(abs(Q_min_o-Q_min_j)<=0.001)
     
